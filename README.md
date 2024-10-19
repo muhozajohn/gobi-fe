@@ -41,7 +41,7 @@ A modern, responsive CRM dashboard built with Next.js, featuring website analyti
 
 ## Live Demo
 
-[View Live Demo](https://your-demo-url.com) (coming soon)
+[View Live Demo](https://bouletteproof-fe.netlify.app/)
 
 ## Getting Started
 
