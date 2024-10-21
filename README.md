@@ -1,4 +1,8 @@
-# CRM Dashboard with Next.js
+# CRM Dashboard ,data analysis and CRM systems with Next.js .
+
+## Credential For Login
+  - password: VickyTheSiant@123
+  - email: muhozajohn250@gmail.com.com
 
 A modern, responsive CRM dashboard built with Next.js, featuring website analytics visualization and customer data management.
 
