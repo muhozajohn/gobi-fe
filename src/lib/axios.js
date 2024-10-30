@@ -1,16 +1,31 @@
 import axios from 'axios';
 
-const axiosInstance = axios.create({
+const http = axios.create({
   baseURL:  process.env.NEXT_PUBLIC_API_URL
 });
 
 
-axiosInstance.interceptors.response.use(
-  response => response,
-  error => {
-    console.error('API Error:', error);
-    return Promise.reject(error);
+const requestHandler = (request) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    request.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return request;
+};
 
-export default axiosInstance;
+const responseHandler = (response) => {
+  return response;
+};
+
+const errorHandler = (error) => {
+  if (error.response && error.response.status === 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  }
+  return Promise.reject(error);
+};
+
+http.interceptors.request.use(requestHandler, errorHandler);
+http.interceptors.response.use(responseHandler, errorHandler);
+
+export default http;
