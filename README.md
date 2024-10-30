@@ -1,120 +1,48 @@
-# CRM Dashboard ,data analysis and CRM systems with Next.js .
+# Event Management System
 
-## Credential For Login
-  - password: VickyTheSiant@123
-  - email: muhozajohn250@gmail.com.com
-
-A modern, responsive CRM dashboard built with Next.js, featuring website analytics visualization and customer data management.
-
-- Landing Page Preview
-  ![image](https://github.com/user-attachments/assets/f63619c8-dc73-4d9b-a4ed-0b7c89c739f7)
-  ![image](https://github.com/user-attachments/assets/4b87038b-9675-4134-9400-d6e04649860d)
-
-- Dashboard Preview
-  ![image](https://github.com/user-attachments/assets/a5f676db-c31b-468b-9671-661d3e680ae7)
-  ![image](https://github.com/user-attachments/assets/13a97229-eea2-4e7c-ab70-b2808fa83c8e)
-
+## Overview
+This project is a simple Event Management System built with Next.js.
 
 ## Features
+1. **Admin Capabilities**:
+   - **Authentication**: Admins can log in to add, edit, or delete events.
+   - **Event Creation**: Admins can create new events with a title, description, date, and available seats.
 
-- **Real-time Analytics Dashboard**
-  - Website visit statistics
-  - Bounce rate tracking
-  - Session duration analysis
-  - Interactive charts using Recharts
-
-- **Customer Management**
-  - Comprehensive customer data table
-  - Advanced search and filtering
-  - Pagination support
-  - Real-time data updates
-
--  **Key Performance Metrics**
-  - Total visitor count
-  - Average session duration
-  - Bounce rate analytics
-  - Customer engagement metrics
+2. **User Capabilities**:
+   - **Event Viewing and Booking**: Users can view all events and book available seats without authentication. Seat availability updates in real-time.
 
 ## Tech Stack
-
-- **Frontend**: Next.js 14, React
-- **Styling**: Tailwind CSS, Shadcn/UI
-- **Data Visualization**: Recharts
-- **State Management**: React Query
-- **Authentication**: NextAuth.js (coming soon)
-
-## Live Demo
-
-[View Live Demo](https://bouletteproof-fe.netlify.app/)
+- **Frontend**: Next.js with server-side rendering
+- **Backend**: Next.js API routes
+- **Database**: Any database of your choice (SQL, NoSQL, or serverless)
+- **Authentication**: NextAuth.js (for admin authentication)
+- **Real-time Updates**: WebSockets or a real-time database solution
 
 ## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-- A Mockaroo API key (for data simulation)
-
-### Installation
-
 1. Clone the repository:
 ```bash
-git clone https://github.com/muhozajohn/Bouletteproof-fe.git
-cd Bouletteproof-fe
+git clone https://github.com/muhozajohn/gobi-fe.git
+cd gobi-fe
 ```
-
 2. Install dependencies:
 ```bash
 npm install
 # or
 yarn install
 ```
-
-3. Create a `.env.local` file in the root directory:
-```env
-MOCKAROO_API_KEY=your_mockaroo_api_key
+3. Set up environment variables:
 ```
-
+NEXT_PUBLIC_API_URL=your_api_url
+```
 4. Start the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 ```
-
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-
-
-## API Integration
-
-The application uses Mockaroo API to simulate real CRM data. API endpoints include:
-
-- `/api/visits` - Website visit statistics
-- `/api/customers` - Customer data with pagination
-- `/api/metrics` - Aggregated metrics
-
-## Development
-
-### Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run test` - Run tests (coming soon)
-
-### Environment Variables
-
-Required environment variables:
-
-```env
-MOCKAROO_API_KEY=your_api_key
-NEXT_PUBLIC_API_URL=your_api_url
-```
-
 ## Contributing
-
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
@@ -122,27 +50,12 @@ NEXT_PUBLIC_API_URL=your_api_url
 5. Open a Pull Request
 
 ## Roadmap
-
-- [ ] Add authentication system
-- [ ] Implement real-time updates
-- [ ] Add export functionality
-- [ ] Enhance search capabilities
-- [ ] Add user roles and permissions
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [Next.js](https://nextjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Recharts](https://recharts.org/)
-- [Shadcn/UI](https://ui.shadcn.com/)
-- [Mockaroo](https://www.mockaroo.com/)
+- [ ] Add authentication system for admins
+- [ ] Implement real-time seat availability updates
+- [ ] Add export functionality for event data
+- [ ] Enhance search and filtering capabilities
+- [ ] Implement user roles and permissions
 
 ## Contact
-
-Portfolio Link:[Muhoza](https://muhoza.vercel.app/)
-
-Project Link: [https://github.com/muhozajohn/Bouletteproof-fe](https://github.com/muhozajohn/Bouletteproof-fe)
+Portfolio: [Muhoza](https://muhoza.vercel.app/)
+Project Link: [https://github.com/muhozajohn/gobi-fe](https://github.com/muhozajohn/gobi-fe)
