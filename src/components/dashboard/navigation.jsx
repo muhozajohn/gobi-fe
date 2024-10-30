@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { LogOut, PlusCircle } from "lucide-react";
 
-const Navigation = () => {
+const Navigation = ({ click }) => {
   const router = useRouter();
 
   const handleLogout = () => {
@@ -20,22 +20,24 @@ const Navigation = () => {
     <nav className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <Link href="/dashboard">
-            <h1 className="text-xl font-semibold cursor-pointer">
-              Analytics Dashboard
+          <div className="flex-shrink-0">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Admin Dashboard
             </h1>
-          </Link>
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/profile"
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={click}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-              Profile
-            </Link>
+              <PlusCircle className="w-5 h-5 mr-2" />
+              Add Event
+            </button>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-blue-700"
             >
+              <LogOut className="w-5 h-5 mr-2" />
               Logout
             </button>
           </div>
