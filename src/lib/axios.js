@@ -4,14 +4,16 @@ const http = axios.create({
   baseURL:  process.env.NEXT_PUBLIC_API_URL
 });
 
-
 const requestHandler = (request) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    request.headers.Authorization = `Bearer ${token}`;
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token) {
+      request.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return request;
 };
+
 
 const responseHandler = (response) => {
   return response;

@@ -26,19 +26,23 @@ const LoginPage = () => {
     setError("");
 
     try {
-      const response = await axios.post(
-        "https://portfolio-be-1sif.onrender.com/api/users/login",
-        values
-      );
+      const { data } = await axios.post("/api/auth", values, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        router.push("/dashboard");
-      }
+      // Store token in localStorage
+      localStorage.setItem("token", data.token);
+
+      // Store user info in localStorage (optional)
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Redirect to dashboard
+      router.push("/dashboard");
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
+      // Set error message from backend or handle network error
+      setError(err.response?.data?.error || "Login failed. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -158,7 +162,7 @@ const LoginPage = () => {
                       {`Don't have an account?`}
                       <Link
                         href="/register"
-                        className="text-blue-600 hover:text-blue-500"
+                        className="text-blue-600 hover:text-blue-500 ml-1"
                       >
                         Register here
                       </Link>

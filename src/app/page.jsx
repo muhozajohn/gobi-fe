@@ -7,7 +7,8 @@ import { images } from "@/common";
 import Navigation from "@/components/navigation";
 import Footer from "@/components/footer";
 import Input from "@/common/Input";
-// import { eventService } from "@/services/eventService";
+import axios from "axios";
+import Spinner from "@/common/Spinner";
 
 const Home = () => {
   const [events, setEvents] = useState([]);
@@ -17,43 +18,32 @@ const Home = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [tickets, setTickets] = useState(1);
   const [email, setEmail] = useState("");
-  // Fetch environment variable
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
-
 
   useEffect(() => {
     fetchEvents();
   }, []);
 
-  // using service
-  // const fetchEvents = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await eventService.getEvents();
-  //     setEvents(response.data || []);
-  //     setError(null);
-  //   } catch (err) {
-  //     console.error("Error fetching events:", err);
-  //     setError("Failed to load events. Please try again later.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  let isRequestPending = false;
+
   const fetchEvents = async () => {
+    if (isRequestPending) return;
+    isRequestPending = true;
+
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/events?page=1&limit=10`);
-
-      if (!response.ok) throw new Error("Failed to fetch events");
-
-      const result = await response.json();
-      setEvents(result.data || []);
+      const response = await axios.get(`/api/events`);
+      setEvents(
+        Array.isArray(response.data)
+          ? response.data
+          : response.data.data.data || []
+      );
       setError(null);
     } catch (err) {
       console.error("Error fetching events:", err);
       setError("Failed to load events. Please try again later.");
     } finally {
       setLoading(false);
+      isRequestPending = false; 
     }
   };
 
@@ -61,26 +51,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
     setSelectedEvent(event);
     setShowBookingModal(true);
   };
-
-  // using service
-  // const handleConfirmBooking = async () => {
-  //   try {
-  //     // Implement booking logic here using eventService
-  //     await eventService.createBooking({
-  //       event_id: selectedEvent._id,
-  //       tickets,
-  //       email,
-  //     });
-
-  //     // Refresh events to update available tickets
-  //     await fetchEvents();
-  //     setShowBookingModal(false);
-  //     // You might want to show a success message here
-  //   } catch (error) {
-  //     console.error("Error booking event:", error);
-  //     // Handle booking error (show error message)
-  //   }
-  // };
 
   const handleConfirmBooking = async () => {
     try {
@@ -90,39 +60,17 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({
-          tickets,
-          email,
-        }),
+        body: JSON.stringify({ tickets, email }),
       });
 
       if (!response.ok) throw new Error("Booking failed");
 
-      // Refresh events to update available tickets
       await fetchEvents();
       setShowBookingModal(false);
-      // Show a success message if needed
     } catch (error) {
       console.error("Error booking event:", error);
-      // Handle booking error (show error message)
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-xl">Loading events...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-xl text-red-600">{error}</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -138,63 +86,74 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
-            <Card
-              key={event._id}
-              className="hover:shadow-lg transition-shadow h-fit"
-            >
-              <div className="relative w-full h-64">
-                <Image
-                  src={event.image_url || images.graph}
-                  alt={event.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <CardHeader>
-                <CardTitle className="text-xl font-bold">
-                  {event.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <p className="text-gray-600">{event.description}</p>
-
-                  <div className="flex items-center text-gray-500">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    <span>
-                      {new Date(event.date_schedule).toLocaleDateString()}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center text-gray-500">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    <span>{event.location}</span>
-                  </div>
-
-                  <div className="flex items-center text-gray-500">
-                    <Users className="w-4 h-4 mr-2" />
-                    <span>{event.available_tickets} tickets available</span>
-                  </div>
-
-                  <div className="flex items-center justify-between mt-4">
-                    <span className="text-lg font-bold">
-                      RWF {event.price.toLocaleString()}
-                    </span>
-                    <button
-                      onClick={() => handleBookEvent(event)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400"
-                      disabled={event.available_tickets === 0}
-                    >
-                      {event.available_tickets > 0 ? "Book Now" : "Sold Out"}
-                    </button>
-                  </div>
+        {loading ? (
+          <div className="min-h-screen bg-gray-50 flex ga-2 items-center justify-center">
+            <Spinner classes={`text-7xl  text-blue-500 `} />{" "}
+            <h1>loading .........</h1>
+          </div>
+        ) : error ? (
+          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="text-xl text-red-600">{error}</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {events.map((event) => (
+              <Card
+                key={event._id}
+                className="hover:shadow-lg transition-shadow h-fit"
+              >
+                <div className="relative w-full h-64">
+                  <Image
+                    src={event.image_url || images.graph}
+                    alt={event.title}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <CardHeader>
+                  <CardTitle className="text-xl font-bold">
+                    {event.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-gray-600">{event.description}</p>
+
+                    <div className="flex items-center text-gray-500">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      <span>
+                        {new Date(event.date_schedule).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center text-gray-500">
+                      <MapPin className="w-4 h-4 mr-2" />
+                      <span>{event.location}</span>
+                    </div>
+
+                    <div className="flex items-center text-gray-500">
+                      <Users className="w-4 h-4 mr-2" />
+                      <span>{event.available_tickets} tickets available</span>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-4">
+                      <span className="text-lg font-bold">
+                        RWF {event.price.toLocaleString()}
+                      </span>
+                      <button
+                        onClick={() => handleBookEvent(event)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400"
+                        disabled={event.available_tickets === 0}
+                      >
+                        {event.available_tickets > 0 ? "Book Now" : "Sold Out"}
+                      </button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
         {showBookingModal && selectedEvent && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -211,7 +170,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
                   <select
                     value={tickets}
                     onChange={(e) => setTickets(Number(e.target.value))}
-                    className="relative text-primary mt-1 text-xs py-2 duration-100 outline-none justify-between flex items-center gap-6 px-2 w-full rounded-md font-semibold border-2 group-hover:border-primary"
+                    className="mt-1 w-full rounded-md border-gray-300 shadow-sm"
                   >
                     {[
                       ...Array(Math.min(5, selectedEvent.available_tickets)),
