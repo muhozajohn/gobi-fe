@@ -1,12 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Edit, Trash2 } from "lucide-react";
 import Navigation from "@/components/dashboard/navigation";
 import Input from "@/common/Input";
-
+import axios from "axios";
 // Mock data included in the component
-const initialEvents = [
+const initialbooking = [
   {
     id: 1,
     title: "Tech Conference 2024",
@@ -40,9 +40,40 @@ const initialEvents = [
 ];
 
 const AdminDashboard = () => {
-  const [events, setEvents] = useState(initialEvents);
+  const [booking, setbooking] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [showEventModal, setShowEventModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
+
+  useEffect(() => {
+    fetchbooking();
+  }, []);
+
+  let isRequestPending = false;
+
+  const fetchbooking = async () => {
+    if (isRequestPending) return;
+    isRequestPending = true;
+
+    try {
+      setLoading(true);
+      const response = await axios.get(`/api/bookings`);
+      setbooking(
+        Array.isArray(response.data)
+          ? response.data
+          : response.data.data.data || []
+      );
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching booking:", err);
+      setError("Failed to load booking. Please try again later.");
+    } finally {
+      setLoading(false);
+      isRequestPending = false; 
+    }
+  };
 
   const handleAddEvent = () => {
     setEditingEvent(null);
@@ -61,7 +92,7 @@ const AdminDashboard = () => {
 
   const handleDeleteEvent = (eventId) => {
     if (window.confirm("Are you sure you want to delete this event?")) {
-      setEvents(events.filter((event) => event.id !== eventId));
+      setbooking(booking.filter((event) => event._id !== eventId));
     }
   };
 
@@ -76,10 +107,10 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Total Events</CardTitle>
+              <CardTitle className="text-lg">Total booking</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold">{events.length}</p>
+              <p className="text-3xl font-bold">{booking.length}</p>
             </CardContent>
           </Card>
 
@@ -89,7 +120,11 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold">
-                {events.reduce((acc, event) => acc + event.availableSeats, 0)}
+              {booking.reduce(
+                  (acc, event) =>
+                    acc + (event?.event_id?.available_tickets - event.number_of_tickets),
+                  0
+                )}
               </p>
             </CardContent>
           </Card>
@@ -100,20 +135,17 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold">
-                {events.reduce(
-                  (acc, event) =>
-                    acc + (event.totalSeats - event.availableSeats),
-                  0
-                )}
+              {booking.reduce((acc, event) => acc + event?.number_of_tickets, 0)}
+
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Events Table */}
+        {/* booking Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Manage Events</CardTitle>
+            <CardTitle>Manage booking</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -141,27 +173,27 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {events.map((event) => (
+                  {booking.map((event) => (
                     <tr key={event.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="font-medium text-gray-900">
-                          {event.title}
+                          {event?.event_id?.title}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {event.description}
+                          {event?.event_id?.description}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(event.date).toLocaleDateString()}
+                        {new Date(event?.event_id?.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {event.location}
+                        {event?.event_id?.location}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {event.availableSeats}/{event.totalSeats}
+                        {event?.number_of_tickets}/{event?.event_id?.available_tickets}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${event.price}
+                        ${event?.total_price}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
@@ -171,7 +203,7 @@ const AdminDashboard = () => {
                           <Edit className="w-5 h-5" />
                         </button>
                         <button
-                          onClick={() => handleDeleteEvent(event.id)}
+                          onClick={() => handleDeleteEvent(event._id)}
                           className="text-red-600 hover:text-red-900"
                         >
                           <Trash2 className="w-5 h-5" />
@@ -202,7 +234,7 @@ const AdminDashboard = () => {
                     inputType={`text`}
                     type="input"
                     className="mt-1 block w-full rounded-md border-black shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    defaultValue={editingEvent?.title}
+                    defaultValue={editingEvent?.event_id?.title}
                   />
                 </div>
 
@@ -213,7 +245,7 @@ const AdminDashboard = () => {
                   <Input
                     className="mt-1 block w-full rounded-md border-black shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     rows="3"
-                    defaultValue={editingEvent?.description}
+                    defaultValue={editingEvent?.event_id?.description}
                   />
                 </div>
 
@@ -226,7 +258,7 @@ const AdminDashboard = () => {
                       inputType={`date`}
                       type="input"
                       className="mt-1 block w-full rounded-md border-black shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      defaultValue={editingEvent?.date}
+                      defaultValue={editingEvent?.event_id?.createdAt}
                     />
                   </div>
                   <div>
@@ -237,7 +269,7 @@ const AdminDashboard = () => {
                       inputType={`text`}
                       type="input"
                       className="mt-1 block w-full rounded-md border-black shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      defaultValue={editingEvent?.location}
+                      defaultValue={editingEvent?.event_id?.location}
                     />
                   </div>
                 </div>
@@ -251,18 +283,18 @@ const AdminDashboard = () => {
                       inputType={`number`}
                       type="input"
                       className="mt-1 block w-full rounded-md border-black shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      defaultValue={editingEvent?.totalSeats}
+                      defaultValue={editingEvent?.event_id?.available_tickets}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Price ($)
+                      Price (Frw)
                     </label>
                     <Input
                       inputType={`number`}
                       type="input"
                       className="mt-1 block w-full rounded-md border-black shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                      defaultValue={editingEvent?.price}
+                      defaultValue={editingEvent?.event_id?.price}
                     />
                   </div>
                 </div>
