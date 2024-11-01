@@ -78,16 +78,20 @@ export async function DELETE(request, { params }) {
   }
 
   try {
-    await http.delete(`/events/${id}`, {
+    const response = await http.delete(`/events/${id}`, {
       headers: { Authorization: token }
     });
 
-    return new NextResponse(null, { status: 204 });
+    if (response.status === 204 || response.status === 200) {
+      return NextResponse.json({ message: 'Booking deleted successfully' }, { status: 200 });
+    } else {
+      throw new Error('Failed to delete booking');
+    }
   } catch (error) {
-    console.error('Error deleting event:', error);
+    console.error('Error deleting booking:', error);
     return NextResponse.json(
-      { error: 'Failed to delete event' },
-      { status: 500 }
+      { error: error.message || 'Failed to delete booking' },
+      { status: error.response?.status || 500 }
     );
   }
 }
