@@ -1,5 +1,9 @@
 # Event Management System
 
+# Username and password
+- gobi@gmail.com
+- gobi@123
+
 ## Overview
 This project is a simple Event Management System built with Next.js.
 
