@@ -1,4 +1,4 @@
-// src/api/auth.js
+
 import { NextResponse } from 'next/server';
 import http from '@/lib/axios';
 

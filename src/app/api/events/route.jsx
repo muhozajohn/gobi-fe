@@ -48,26 +48,37 @@ export async function POST(request) {
   }
 
   try {
-    const body = await request.json();
+    const formData = await request.formData();
     
-    // Validate required fields
-    if (!body.title || !body.date) {
-      return NextResponse.json(
-        { error: 'Title and date are required' },
-        { status: 400 }
-      );
+    const apiFormData = new FormData();
+    
+    for (const [key, value] of formData.entries()) {
+      if (key === 'image' && value instanceof File) {
+        apiFormData.append('image', value, value.name);
+      } else {
+        apiFormData.append(key, value);
+      }
     }
 
-    const response = await http.post('/events', body, {
-      headers: { Authorization: token }
+    const response = await http.post('/events', apiFormData, {
+      headers: { 
+        Authorization: token,
+      }
     });
 
     return NextResponse.json(response.data, { status: 201 });
   } catch (error) {
     console.error('Error creating event:', error);
+    let errorMessage = 'Failed to create event';
+    
+    // Handle specific error cases
+    if (error.response) {
+      errorMessage = error.response.data?.error || errorMessage;
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to create event' },
-      { status: 500 }
+      { error: errorMessage },
+      { status: error.response?.status || 500 }
     );
   }
 }

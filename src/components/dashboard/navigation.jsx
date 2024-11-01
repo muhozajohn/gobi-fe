@@ -1,10 +1,9 @@
 "use client";
-
 import React from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, PlusCircle } from "lucide-react";
 
-const Navigation = ({ click }) => {
+const Navigation = ({click}) => {
   const router = useRouter();
 
   const handleLogout = () => {
